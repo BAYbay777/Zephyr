@@ -10,7 +10,7 @@ body{ background-color:lightblue;
 ul{list-style-type:none;
     background-color: aqua ;
     text-align: center;
-    border: 2px solid blue;*
+    border: 0px solid blue;*
    }
 li{display:inline;
    padding: 5px;
