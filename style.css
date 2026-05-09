@@ -1,17 +1,32 @@
 /*place your css in this file here*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 h1 {
     text-align: center;
     font-family: "Source Sans Pro", sans-serif;
     font-weight: bold;
+    font-size: 55px;
     color :yellowgreen;
+    background-color: #FFFBDE;
+    margin: 0;
+    padding: 20px;
     }
-body{ background-color:lightblue;
+body{ background-color: #91C8E4;
      }
 ul{list-style-type:none;
-    background-color: aqua ;
+    background-color: #4682A9 ;
     text-align: center;
     border: 0px solid blue;*
+    margin: 0;
+    padding: 10px 0;
+    font-size: 18px;
    }
 li{display:inline;
-   padding: 5px;
+   padding: 15px;
+   font-size: 35px;
    }
+iframe{  display: block;
+       }
