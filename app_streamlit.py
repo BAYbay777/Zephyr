@@ -8,20 +8,17 @@ from datetime import datetime
 # ==========================================
 st.set_page_config(page_title="Zephyr Workspace", layout="wide", initial_sidebar_state="collapsed")
 
-# Menyembunyikan bumbu-bumbu aksesoris default bawaan Streamlit
+# CSS INJECTION: Memaksa semua elemen Streamlit (Input & Teks) berwarna cerah dan kontras!
 st.markdown("""
     <style>
     #MainMenu, footer, header { visibility: hidden; }
     .stApp { 
         background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%) !important; 
     }
-    * {
-        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important;
-    }
     
     /* Box Kartu Putih Bulat Cantik Murni Desain Pertama Kamu */
     .zephyr-card {
-        background: rgba(255, 255, 255, 0.85) !important;
+        background: rgba(255, 255, 255, 0.9) !important;
         backdrop-filter: blur(16px);
         border-radius: 24px !important;
         padding: 35px !important;
@@ -33,7 +30,7 @@ st.markdown("""
     .card-title {
         font-size: 20px !important;
         font-weight: 700 !important;
-        color: #334155 !important;
+        color: #1e293b !important;
         margin-bottom: 6px !important;
     }
     
@@ -41,6 +38,25 @@ st.markdown("""
         font-size: 13px !important;
         color: #64748b !important;
         margin-bottom: 25px !important;
+    }
+
+    /* FIX WARNA INPUT BOX BAR AGAR TIDAK GELAP */
+    div[data-baseweb="input"] {
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 12px !important;
+    }
+    
+    input {
+        color: #0f172a !important; /* Warna teks input hitam pekat */
+        background-color: #ffffff !important;
+    }
+    
+    /* FIX WARNA TEKS LIST TUGAS & CHECKBOX */
+    .stCheckbox label p {
+        color: #0f172a !important; /* Memaksa teks tugas berwarna hitam kontras */
+        font-weight: 500 !important;
+        font-size: 15px !important;
     }
 
     /* Style Tombol Pastel Angin Lembut */
@@ -60,7 +76,7 @@ st.markdown("""
     
     /* Tombol Keluar / Hapus Trash */
     div.stButton > button[key^="logout_"], div.stButton > button[key^="del_"] {
-        background: #f1f5f9 !important;
+        background: #fee2e2 !important;
         color: #ef4444 !important;
     }
     
@@ -68,7 +84,7 @@ st.markdown("""
     .timer-digital {
         font-size: 70px !important;
         font-weight: 700 !important;
-        color: #334155 !important;
+        color: #1e293b !important;
         text-align: center;
         margin: 20px 0;
         font-family: monospace !important;
@@ -78,7 +94,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. PENGELOLA DATABASE JSON OTOMATIS (ANTI-ERROR)
+# 2. PENGELOLA DATABASE JSON OTOMATIS
 # ==========================================
 DATA_FILE = "zephyr_master_database.json"
 
@@ -87,7 +103,6 @@ def load_data():
         with open(DATA_FILE, 'r') as f:
             try:
                 data = json.load(f)
-                # Validasi struktur data lama secara otomatis
                 for username in data:
                     if "tasks" in data[username]:
                         validated_tasks = []
@@ -108,7 +123,6 @@ def save_data(data):
 
 db = load_data()
 
-# Inisialisasi State Kontrol Aplikasi
 if 'user' not in st.session_state:
     st.session_state['user'] = None
 if 'auth_page' not in st.session_state:
@@ -121,7 +135,7 @@ if 'custom_minutes' not in st.session_state:
     st.session_state['custom_minutes'] = 25
 
 # ==========================================
-# 3. INTERFACE HALAMAN DEPAN (LOGIN & REGISTER KARTU TERPISAH)
+# 3. INTERFACE HALAMAN DEPAN (LOGIN & REGISTER)
 # ==========================================
 if st.session_state['user'] is None:
     st.write("<div style='margin-top: 80px;'></div>", unsafe_allow_html=True)
@@ -153,7 +167,6 @@ if st.session_state['user'] is None:
         else:
             st.markdown('<div class="zephyr-card">', unsafe_allow_html=True)
             st.markdown("<h2 style='text-align: center; color: #334155; margin-bottom: 5px; font-weight:700;'>Buat Akun Baru</h2>", unsafe_allow_html=True)
-            st.markdown("<p style='text-align: center; color: #64748b; font-size:13px; margin-bottom: 30px;'>Simpan seluruh list tugas dan riwayat emosimu</p>", unsafe_allow_html=True)
             
             reg_user = st.text_input("Buat Username", key="txt_ruser", placeholder="Contoh: baybay").strip().lower()
             reg_pass = st.text_input("Buat Password", type="password", key="txt_rpass", placeholder="Minimal 4 karakter...")
@@ -183,39 +196,34 @@ else:
     user = st.session_state['user']
     user_tasks = db[user].get("tasks", [])
     
-    # Navigasi Atas Workspace Murni
     col_u1, col_u2 = st.columns([0.85, 0.15])
     col_u1.markdown(f"<p style='color:#64748b; font-size:15px; margin-top:12px;'>Workspace Pengguna: <span style='color:#38bdf8; font-weight:700;'>{user.upper()}</span></p>", unsafe_allow_html=True)
     if col_u2.button("Keluar Akun", key="logout_key", use_container_width=True):
         st.session_state['user'] = None
         st.rerun()
 
-    # Layout Utama 2 Kolom Berdampingan (Timer vs To-Do List)
     col_kiri, col_kanan = st.columns([1, 1])
     
-    # --- KOLOM KIRI: KUSTOM TIMER & MUSIK SPOTIFY ---
+    # --- KOLOM KIRI: KUSTOM TIMER & MUSIK AUTOMATIC PLAY ---
     with col_kiri:
         st.markdown('<div class="zephyr-card">', unsafe_allow_html=True)
         st.markdown('<div class="card-title">⏱️ Timer & Musik</div>', unsafe_allow_html=True)
-        st.markdown('<div class="card-subtitle">Atur durasi fokus kustom dan dengarkan musik pilihanmu.</div>', unsafe_allow_html=True)
+        st.markdown('<div class="card-subtitle">Bar waktu berwarna cerah. Lagu otomatis berputar saat timer dimulai!</div>', unsafe_allow_html=True)
         
-        # Pengaturan Waktu Kustom Realtime Menit
         c_set1, c_set2 = st.columns([0.7, 0.3])
-        new_min = c_set1.number_input("Atur waktu manual (menit):", min_value=1, max_value=120, value=int(st.session_state['custom_minutes']))
+        new_min = c_set1.number_input("Atur waktu kustom (menit):", min_value=1, max_value=120, value=int(st.session_state['custom_minutes']))
         if c_set2.button("Set Waktu", use_container_width=True):
             st.session_state['custom_minutes'] = new_min
             st.session_state['timer_seconds'] = new_min * 60
             st.session_state['timer_active'] = False
             st.rerun()
             
-        # Hitung angka mundur jam digital
         t_placeholder = st.empty()
         m, s = divmod(st.session_state['timer_seconds'], 60)
         t_placeholder.markdown(f'<div class="timer-digital">{m:02d}:{s:02d}</div>', unsafe_allow_html=True)
         
-        # Tombol Aksi Kontrol Utama Timer
         ctrl_1, ctrl_2, ctrl_3 = st.columns(3)
-        if ctrl_1.button("Mulai", use_container_width=True):
+        if ctrl_1.button("Mulai Fokus", use_container_width=True):
             st.session_state['timer_active'] = True
             
         if ctrl_2.button("Jeda", use_container_width=True):
@@ -226,7 +234,7 @@ else:
             st.session_state['timer_active'] = False
             st.rerun()
             
-        # Loop hitung mundur detik aktif bawaan Streamlit
+        # LOGIK HITUNG MUNDUR DETIK
         if st.session_state['timer_active'] and st.session_state['timer_seconds'] > 0:
             import time
             time.sleep(1)
@@ -236,23 +244,27 @@ else:
                 st.balloons()
             st.rerun()
             
-        # Embed Widget Musik Spotify Resmi
+        # EMBED SPOTIFY DENGAN KONDISI AUTOPLAY OTOMATIS JIKA TIMER START
         st.write("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
-        st.markdown("""
-            <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1PX8gZp244?utm_source=generator" width="100%" height="80" 
-            frameborder="0" allowtransparency="true" allow="encrypted-media" style="border-radius: 12px;"></iframe>
+        
+        # Jika timer aktif, tambahkan parameter &autoplay=1 pada iframe link Spotify
+        autoplay_param = "&autoplay=1" if st.session_state['timer_active'] else ""
+        spotify_url = f"https://open.spotify.com/embed/playlist/37i9dQZF1PX8gZp244?utm_source=generator{autoplay_param}"
+        
+        st.markdown(f"""
+            <iframe src="{spotify_url}" width="100%" height="80" 
+            frameborder="0" allowtransparency="true" allow="autoplay; encrypted-media" style="border-radius: 12px;"></iframe>
         """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- KOLOM KANAN: LIST TUGAS (BISA DICHECKLIST) ---
+    # --- KOLOM KANAN: LIST TUGAS (Teks Hitam Kontras Jelas) ---
     with col_kanan:
         st.markdown('<div class="zephyr-card">', unsafe_allow_html=True)
         st.markdown('<div class="card-title">📝 List Tugas</div>', unsafe_allow_html=True)
-        st.markdown('<div class="card-subtitle">Centang tugas yang sukses kamu selesaikan hari ini.</div>', unsafe_allow_html=True)
+        st.markdown('<div class="card-subtitle">Centang tugas harian yang sukses kamu selesaikan.</div>', unsafe_allow_html=True)
         
-        # Tambah Tugas Baru
         col_t1, col_t2 = st.columns([0.75, 0.25])
-        new_txt = col_t1.text_input("Input tugas", placeholder="Ketik tugas barumu di sini...", label_visibility="collapsed")
+        new_txt = col_t1.text_input("Input tugas baru", placeholder="Ketik tugas barumu di sini...", label_visibility="collapsed")
         if col_t2.button("Tambah", use_container_width=True):
             if new_txt:
                 user_tasks.append({"text": new_txt, "done": False})
@@ -262,12 +274,10 @@ else:
         
         st.write("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
         
-        # Menampilkan Checklist Tugas Secara Reaktif
         if user_tasks:
             for idx, item in enumerate(user_tasks):
                 col_c1, col_c2 = st.columns([0.85, 0.15])
                 
-                # Checkbox interaktif
                 is_checked = col_c1.checkbox(item["text"], value=item["done"], key=f"chk_{idx}")
                 if is_checked != item["done"]:
                     user_tasks[idx]["done"] = is_checked
@@ -275,7 +285,6 @@ else:
                     save_data(db)
                     st.rerun()
                     
-                # Tombol Hapus Tugas Sampah
                 if col_c2.button("🗑️", key=f"del_{idx}"):
                     user_tasks.pop(idx)
                     db[user]["tasks"] = user_tasks
@@ -286,12 +295,10 @@ else:
             
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- KARTU BAWAH BENAM: PELACAK EMOSI / MOOD TRACKER ---
+    # --- KARTU BAWAH BENAM: MOOD TRACKER ---
     st.markdown('<div class="zephyr-card">', unsafe_allow_html=True)
     st.markdown('<div class="card-title">📊 Riwayat Pelacak Mood</div>', unsafe_allow_html=True)
-    st.markdown('<div class="card-subtitle">Catat suasana hatimu setelah menyelesaikan sesi belajar harian.</div>', unsafe_allow_html=True)
     
-    # Input Catat Jurnal Mood Baru
     m_col1, m_col2 = st.columns([0.7, 0.3])
     mood_input = m_col1.selectbox("Bagaimana perasaanmu saat ini?", ["😊 Bahagia & Produktif", "😐 Biasa Saja", "🙁 Stres / Lelah"])
     if m_col2.button("Simpan Mood", use_container_width=True):
@@ -301,7 +308,6 @@ else:
         st.success("Mood berhasil dicatat!")
         st.rerun()
         
-    # Tampilan Grid Riwayat Mood Bulanan
     history = db[user].get("mood_history", {})
     if history:
         st.write("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
