@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Zephyr (Soft Breeze)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-soft: 0 10px 30px -10px rgba(148, 163, 184, 0.2);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        nav .logo {
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: 2px;
+            color: #0284c7;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            color: #0284c7;
+        }
+
+        .hero-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .hero-section h1 {
+            font-size: 64px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 20px 0;
+            letter-spacing: -1px;
+        }
+
+        .hero-section p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 0 40px 0;
+            line-height: 1.6;
+        }
+
+        .btn-start {
+            font-family: inherit;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 16px 32px;
+            background-color: #38bdf8;
+            color: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn-start:hover {
+            background-color: #0284c7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">ZEPHYR</div>
+        <ul>
+            <li><a href="/" class="active">home</a></li>
+            <li><a href="/design">design</a></li>
+            <li><a href="/product">product</a></li>
+        </ul>
+    </nav>
+
+    <div class="hero-section">
+        <h1>ZEPHYR</h1>
+        <p>Temukan ketenangan dalam produktivitas. Kelola tugas harianmu, atur waktu fokus, dan pantau kesehatan mentalmu selembut embusan angin malam.</p>
+        <a href="/product" class="btn-start">Mulai Sesi Sekarang</a>
+    </div>
+<div style="position: relative; width: 100%; height: 0; padding-top: 393.5578%;
+ padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
+ border-radius: 8px; will-change: transform;">
+  <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+    src="https://www.canva.com/design/DAHHQJrjw0U/2mtxScgkRSpmjV5Y0ZqGBA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+  </iframe>
+</div>
+</body>
+</html>
