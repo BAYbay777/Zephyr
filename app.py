@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, jsonify, redirect, session
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -7,8 +8,9 @@ from datetime import datetime
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = "ZEPHYR_SUPER_SECRET_KEY"
 
-MOOD_FILE = 'mood_data.json'
-TASKS_FILE = 'tasks_data.json'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MOOD_FILE = os.path.join(BASE_DIR, 'mood_data.json')
+TASKS_FILE = os.path.join(BASE_DIR, 'tasks_data.json')
 
 # --- KONFIGURASI SPOTIFY API ---
 SPOTIFY_CLIENT_ID = 'MASUKKAN_CLIENT_ID_SPOTIFY_KAMU'
