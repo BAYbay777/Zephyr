@@ -3,7 +3,7 @@ import json
 import os
 from datetime import datetime
 
-# 1. Atur konfigurasi halaman agar penuh dan bersih tanpa bumbu Streamlit
+# 1. Seting dasar halaman agar full screen dan bersih tanpa komponen bawaan Streamlit
 st.set_page_config(page_title="Zephyr Workspace", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""
@@ -14,30 +14,29 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 2. Sinkronisasi Database JSON tunggal (Aman & tervalidasi)
-USERS_FILE = "users_data.json"
+# 2. Kelola database JSON lokal otomatis (Anti-Error)
+DATA_FILE = "users_data.json"
 
 def load_data():
-    if os.path.exists(USERS_FILE):
-        with open(USERS_FILE, 'r') as f:
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, 'r') as f:
             try: return json.load(f)
             except: return {}
     return {}
 
 def save_data(data):
-    with open(USERS_FILE, 'w') as f:
+    with open(DATA_FILE, 'w') as f:
         json.dump(data, f, indent=4)
 
 db = load_data()
 
-# Inisialisasi Session Pengguna
+# Session State Pengguna Aktif
 if 'user' not in st.session_state:
     st.session_state['user'] = None
 
-# Menerima instruksi data kiriman balik dari Javascript HTML lewat URL parameter
+# 3. Tangkap kiriman data balik dari JavaScript HTML melalui URL Parameter
 query_params = st.query_params
 
-# A. Handle Aksi Login & Register dari HTML
 if "action" in query_params:
     action = query_params["action"]
     u = query_params.get("u", "").strip().lower()
@@ -56,7 +55,6 @@ if "action" in query_params:
         st.query_params.clear()
         st.rerun()
 
-# B. Handle Aksi Simpan Tugas & Checklist dari HTML
 if st.session_state['user']:
     current_user = st.session_state['user']
     
@@ -82,42 +80,28 @@ if st.session_state['user']:
         st.query_params.clear()
         st.rerun()
 
-# ==========================================
-# 3. RENDER PEMBACAAN FILE HTML ASLI KAMU
-# ==========================================
-if st.session_state['user'] is None:
-    # JIKA BELUM LOGIN: Baca file Product.html dan paksa tampilkan card Login/Register di awal
-    if os.path.exists("templates/Product.html"):
-        with open("templates/Product.html", "r", encoding="utf-8") as f:
-            html_content = f.read()
-            
-        # Suntikan Javascript agar modal login langsung terbuka otomatis di awal secara terpisah
-        injection = """
-        <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            if(typeof showAuthModal === 'function') { showAuthModal(); }
-            else { document.getElementById('authModal').style.display = 'flex'; }
-        });
-        </script>
-        """
-        st.components.v1.html(html_content + injection, height=800, scroller=True)
-else:
-    # JIKA SUDAH LOGIN: Lempar data list tugas dan riwayat mood user ke dalam HTML asli kamu
-    current_user = st.session_state['user']
+# 4. JEMBATAN RENDER: Menampilkan File HTML Asli Kamu Secara Hidup!
+html_path = "templates/Product.html"
+
+if os.path.exists(html_path):
+    with open(html_path, "r", encoding="utf-8") as f:
+        html_content = f.read()
+        
+    # Ambil data spesifik user jika sudah berhasil masuk ke aplikasi
+    current_user = st.session_state['user'] if st.session_state['user'] else ""
     user_data = db.get(current_user, {"tasks": [], "mood_history": {}})
     
-    if os.path.exists("templates/Product.html"):
-        with open("templates/Product.html", "r", encoding="utf-8") as f:
-            html_content = f.read()
-            
-        # Kirim data Python ke variabel Javascript di HTML agar To-Do List & Mood terisi realtime
-        data_injection = f"""
-        <script>
-            window.current_user = "{current_user}";
-            window.initial_tasks = {json.dumps(user_data.get("tasks", []))};
-            window.initial_moods = {json.dumps(user_data.get("mood_history", {{}}))};
-        </script>
-        """
-        # Gabungkan data dan tampilkan halaman dashboard aslimu
-        full_html = html_content.replace("<head>", f"<head>{data_injection}")
-        st.components.v1.html(full_html, height=1200, scroller=True)
+    # Suntikkan variabel Python ke memori JavaScript browser agar dibaca otomatis oleh Product.html
+    data_injection = f"""
+    <script>
+        window.current_user = "{current_user}";
+        window.initial_tasks = {json.dumps(user_data.get("tasks", []))};
+        window.initial_moods = {json.dumps(user_data.get("mood_history", {{}}))};
+    </script>
+    """
+    full_live_html = html_content.replace("<head>", f"<head>{data_injection}")
+    
+    # PERBAIKAN UTAMA: Menggunakan komponen html murni agar tidak ternder sebagai teks biasa!
+    st.components.v1.html(full_live_html, height=1000, scroller=True)
+else:
+    st.error("File 'templates/Product.html' tidak ditemukan! Pastikan foldernya sudah benar di VS Code.")
