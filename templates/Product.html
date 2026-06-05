@@ -480,6 +480,51 @@
 
     window.onload = function() {
         loadMoodReport();
+        // --- Fungsi Kirim Login & Register ke Streamlit Cloud ---
+function loginUser(username, password) {
+    window.parent.location.href = window.parent.location.pathname + `?action=login&u=${encodeURIComponent(username)}&p=${encodeURIComponent(password)}`;
+}
+
+function registerUser(username, password) {
+    window.parent.location.href = window.parent.location.pathname + `?action=register&u=${encodeURIComponent(username)}&p=${encodeURIComponent(password)}`;
+}
+
+function logoutUser() {
+    window.parent.location.href = window.parent.location.pathname + '?logout=true';
+}
+
+// --- Fungsi Sinkronisasi To-Do List Interaktif (Bisa Dichecklist & Tersimpan) ---
+function saveTasksToBackend() {
+    const taskItems = document.querySelectorAll('.task-item');
+    let taskData = [];
+    
+    taskItems.forEach(item => {
+        taskData.push({
+            task_name: item.querySelector('.task-text').innerText,
+            completed: item.querySelector('input[type="checkbox"]').checked
+        });
+    });
+
+    // Kirim langsung array data ke server Python Streamlit
+    window.parent.location.href = window.parent.location.pathname + `?save_tasks=true&tasks_data=${encodeURIComponent(JSON.stringify(taskData))}`;
+}
+
+// --- Fungsi Simpan Laporan Mood Setelah Timer Selesai ---
+function saveMoodToBackend(moodValue) {
+    window.parent.location.href = window.parent.location.pathname + `?save_mood=true&mood=${moodValue}`;
+}
+
+// --- Load Data Otomatis saat Halaman Terbuka ---
+document.addEventListener("DOMContentLoaded", () => {
+    // Jika ada data limpahan dari Streamlit, render ke UI HTML aslimu
+    if (window.initial_tasks) {
+        const taskList = document.getElementById("taskList");
+        taskList.innerHTML = "";
+        window.initial_tasks.forEach(task => {
+            // Render list tugas dengan checkbox aslimu di sini...
+        });
+    }
+});
     };
     </script>
 </body>
