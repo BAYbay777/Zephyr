@@ -1,3 +1,8 @@
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+import os
+
+app = Flask(__name__)
+app.secret_key = 'angin_lembut_zephyr_rahasia' # Dibutuhkan untuk mengamankan data session
 import os
 from flask import Flask, render_template, request, jsonify, redirect, session
 import spotipy
