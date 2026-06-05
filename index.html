@@ -5,31 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - Zephyr (Soft Breeze)</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* --- TEMA UTAMA: ANGIN LEMBUT (SOFT BREEZE) --- */
         :root {
             --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
             --card-bg: rgba(255, 255, 255, 0.85);
             --text-main: #334155;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
-            --shadow-soft: 0 10px 30px -10px rgba(148, 163, 184, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg-gradient);
             color: var(--text-main);
-            margin: 0;
-            padding: 0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
+        /* --- BAR NAVIGASI --- */
         nav {
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(10px);
-            padding: 15px 40px;
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -47,14 +54,18 @@
             list-style: none;
             display: flex;
             gap: 30px;
-            margin: 0;
-            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
         }
 
         nav ul li a {
             text-decoration: none;
             color: var(--text-muted);
             font-weight: 500;
+            font-size: 16px;
+            text-transform: lowercase;
             transition: color 0.3s ease;
         }
 
@@ -62,6 +73,7 @@
             color: #0284c7;
         }
 
+        /* --- HERO SECTION --- */
         .hero-section {
             flex: 1;
             display: flex;
@@ -69,14 +81,16 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 0 20px;
+            padding: 60px 20px;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .hero-section h1 {
             font-size: 64px;
             font-weight: 700;
             color: #0f172a;
-            margin: 0 0 20px 0;
+            margin-bottom: 20px;
             letter-spacing: -1px;
         }
 
@@ -84,10 +98,11 @@
             font-size: 18px;
             color: var(--text-muted);
             max-width: 600px;
-            margin: 0 0 40px 0;
+            margin-bottom: 40px;
             line-height: 1.6;
         }
 
+        /* --- TOMBOL UTAMA --- */
         .btn-start {
             font-family: inherit;
             font-weight: 600;
@@ -105,6 +120,32 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
         }
+
+        /* --- INTEGRASI EMBED CANVA RESPONSIVE --- */
+        .canva-wrapper {
+            max-width: 1000px;
+            width: 90%;
+            margin: 20px auto 50px auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .canva-container {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-top: 56.25%; /* Rasio aspek 16:9 widescreen */
+        }
+
+        .canva-container iframe {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -112,23 +153,24 @@
     <nav>
         <div class="logo">ZEPHYR</div>
         <ul>
-            <li><a href="/" class="active">home</a></li>
-            <li><a href="/design">design</a></li>
-            <li><a href="/product">product</a></li>
+            <li><a href="index.html" class="active">home</a></li>
+            <li><a href="design.html">design</a></li>
+            <li><a href="Product.html">product</a></li>
         </ul>
     </nav>
 
     <div class="hero-section">
         <h1>ZEPHYR</h1>
         <p>Temukan ketenangan dalam produktivitas. Kelola tugas harianmu, atur waktu fokus, dan pantau kesehatan mentalmu selembut embusan angin malam.</p>
-        <a href="/product" class="btn-start">Mulai Sesi Sekarang</a>
+        <a href="Product.html" class="btn-start">Mulai Sesi Sekarang</a>
     </div>
-<div style="position: relative; width: 100%; height: 0; padding-top: 393.5578%;
- padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
- border-radius: 8px; will-change: transform;">
-  <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
-    src="https://www.canva.com/design/DAHHQJrjw0U/2mtxScgkRSpmjV5Y0ZqGBA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
-  </iframe>
-</div>
+
+    <div class="canva-wrapper">
+        <div class="canva-container">
+            <iframe loading="lazy" src="https://www.canva.com/design/DAHHQJrjw0U/2mtxScgkRSpmjV5Y0ZqGBA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+            </iframe>
+        </div>
+    </div>
+
 </body>
 </html>
