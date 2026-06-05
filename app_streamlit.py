@@ -2,89 +2,20 @@ import streamlit as st
 import json
 import os
 import time
-from datetime import datetime
 
-# 1. Konfigurasi Dasar Halaman (Wajib di bagian paling atas)
-st.set_page_config(page_title="Zephyr Workspace", layout="wide", initial_sidebar_state="collapsed")
+# 1. Setting dasar halaman Streamlit
+st.set_page_config(page_title="Zephyr", layout="wide", initial_sidebar_state="collapsed")
 
-# ==========================================
-# CUSTOM CSS: MEROMBAK TOTAL STREAMLIT MENJADI DESAIN LAMA
-# ==========================================
+# --- CSS UNTUK MENYEMBUNYIKAN ELEMEN UTAMA STREAMLIT ---
 st.markdown("""
     <style>
-    /* Menyembunyikan elemen bawaan Streamlit agar bersih */
     #MainMenu, footer, header { visibility: hidden; }
-    .stApp { 
-        background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%) !important; 
-        padding-top: 0px;
-    }
-    
-    /* Font global menggunakan Plus Jakarta Sans/Inter */
-    * {
-        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important;
-    }
-
-    /* Mengubah gaya container box (Kartu Putih Estetik) */
-    .zephyr-card {
-        background-color: white !important;
-        border-radius: 20px !important;
-        padding: 35px !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02) !important;
-        border: 1px solid rgba(255, 255, 255, 0.8) !important;
-        margin-bottom: 25px;
-    }
-
-    /* Mengubah gaya input teks */
-    .stTextInput>div>div>input {
-        background-color: #f8fafc !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 10px !important;
-        padding: 12px !important;
-        color: #334155 !important;
-    }
-    
-    /* Mengubah gaya tombol utama (Biru Muda Lembut) */
-    .stButton>button {
-        background: #38bdf8 !important;
-        color: white !important;
-        border-radius: 10px !important;
-        border: none !important;
-        padding: 10px 24px !important;
-        font-weight: 600 !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2) !important;
-    }
-    .stButton>button:hover {
-        background: #0ea5e9 !important;
-        transform: translateY(-1px) !important;
-    }
-
-    /* Tombol Merah/Reset */
-    div.stButton > button[key^="reset_"] {
-        background: #fca5a5 !important;
-        box-shadow: 0 4px 12px rgba(252, 165, 165, 0.2) !important;
-    }
-
-    /* Judul dan Teks */
-    h2, h3 {
-        color: #1e293b !important;
-        font-weight: 700 !important;
-    }
-    
-    /* Gaya Angka Timer Raksasa */
-    .timer-display {
-        font-size: 80px !important;
-        font-weight: 700 !important;
-        color: #1e293b !important;
-        text-align: center;
-        margin: 20px 0;
-        font-family: monospace !important;
-        letter-spacing: -2px;
-    }
+    .stApp { background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%) !important; }
+    iframe { background: transparent !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# 2. Manajemen Database JSON
+# 2. Database JSON Tunggal
 DATA_FILE = "zephyr_master_data.json"
 
 def load_data():
@@ -100,196 +31,327 @@ def save_data(data):
 
 db = load_data()
 
-# Sesi state aplikasi
+# Session State
 if 'user' not in st.session_state:
     st.session_state['user'] = None
-if 'page' not in st.session_state:
-    st.session_state['page'] = 'login'
-if 'timer_done' not in st.session_state:
-    st.session_state['timer_done'] = False
+if 'auth_page' not in st.session_state:
+    st.session_state['auth_page'] = 'login'
 
 # ==========================================
-# HALAMAN 1: PROSES AUTENTIKASI (LOGIN / REGISTER SEPARATE)
+# HALAMAN DEPAN: REGISTRASI & LOGIN TERPISAH
 # ==========================================
 if st.session_state['user'] is None:
-    col_space1, col_box, col_space2 = st.columns([1, 1.2, 1])
-    
-    with col_box:
-        st.write("<div style='margin-top: 80px;'></div>", unsafe_allow_html=True)
+    # Menggunakan HTML Murni untuk Tampilan Card Login/Register agar Sangat Estetik
+    if st.session_state['auth_page'] == 'login':
+        st.markdown("""
+            <div style="max-width: 400px; margin: 80px auto 20px auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); text-align: center; font-family: 'Plus Jakarta Sans', sans-serif;">
+                <h2 style="color: #1e293b; margin-bottom: 10px; font-weight: 700;">Masuk ke Zephyr</h2>
+                <p style="color: #94a3b8; font-size: 14px; margin-bottom: 25px;">Fokus selembut embusan angin.</p>
+            </div>
+        """, unsafe_allow_html=True)
         
-        if st.session_state['page'] == 'login':
-            st.markdown('<div class="zephyr-card">', unsafe_allow_html=True)
-            st.markdown("<h2 style='text-align: center; margin-bottom: 25px;'>Masuk ke Zephyr</h2>", unsafe_allow_html=True)
-            
-            login_user = st.text_input("Username", key="lin_user").strip().lower()
-            login_pass = st.text_input("Password", type="password", key="lin_pass")
-            
-            st.write("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
+        c1, c2, c3 = st.columns([1, 1.2, 1])
+        with c2:
+            username = st.text_input("Username", key="l_user", placeholder="Masukkan username...").strip().lower()
+            password = st.text_input("Password", type="password", key="l_pass", placeholder="Masukkan password...")
+            st.write("")
             if st.button("Masuk", use_container_width=True):
-                if login_user in db and db[login_user]["password"] == login_pass:
-                    st.session_state['user'] = login_user
+                if username in db and db[username]["password"] == password:
+                    st.session_state['user'] = username
                     st.rerun()
                 else:
-                    st.error("Username atau password salah.")
+                    st.error("Username atau password salah!")
             
-            st.markdown("<p style='text-align: center; margin-top: 20px; font-size: 14px;'>Belum punya akun? </p>", unsafe_allow_html=True)
-            if st.button("Daftar Akun Baru di Sini", use_container_width=True):
-                st.session_state['page'] = 'register'
+            st.write("---")
+            if st.button("Belum punya akun? Daftar di sini", use_container_width=True):
+                st.session_state['auth_page'] = 'register'
                 st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
-            
-        elif st.session_state['page'] == 'register':
-            st.markdown('<div class="zephyr-card">', unsafe_allow_html=True)
-            st.markdown("<h2 style='text-align: center; margin-bottom: 25px;'>Buat Akun Zephyr</h2>", unsafe_allow_html=True)
-            
-            reg_user = st.text_input("Buat Username", key="reg_user").strip().lower()
-            reg_pass = st.text_input("Buat Password", type="password", key="reg_pass")
-            
-            st.write("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
+
+    elif st.session_state['auth_page'] == 'register':
+        st.markdown("""
+            <div style="max-width: 400px; margin: 80px auto 20px auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); text-align: center; font-family: 'Plus Jakarta Sans', sans-serif;">
+                <h2 style="color: #1e293b; margin-bottom: 10px; font-weight: 700;">Buat Akun Baru</h2>
+                <p style="color: #94a3b8; font-size: 14px; margin-bottom: 25px;">Mulai perjalanan fokusmu hari ini.</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        c1, c2, c3 = st.columns([1, 1.2, 1])
+        with c2:
+            new_user = st.text_input("Buat Username", key="r_user", placeholder="Contoh: baybay").strip().lower()
+            new_pass = st.text_input("Buat Password", type="password", key="r_pass", placeholder="Minimal 4 karakter...")
+            st.write("")
             if st.button("Daftar Sekarang", use_container_width=True):
-                if not reg_user or not reg_pass:
-                    st.error("Data tidak boleh kosong!")
-                elif reg_user in db:
-                    st.error("Username sudah digunakan!")
+                if not new_user or not new_pass:
+                    st.error("Form tidak boleh kosong!")
+                elif new_user in db:
+                    st.error("Username sudah terpakai!")
                 else:
-                    db[reg_user] = {"password": reg_pass, "tasks": [], "mood_history": {}}
+                    db[new_user] = {"password": new_pass, "tasks": [], "mood_history": {}}
                     save_data(db)
-                    st.success("Akun berhasil didaftarkan!")
-                    st.session_state['page'] = 'login'
+                    st.success("Akun berhasil dibuat! Mengalihkan...")
                     time.sleep(1)
+                    st.session_state['auth_page'] = 'login'
                     st.rerun()
                     
             if st.button("Kembali ke Login", use_container_width=True):
-                st.session_state['page'] = 'login'
+                st.session_state['auth_page'] = 'login'
                 st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
 
 # ==========================================
-# HALAMAN 2: DASHBOARD UTAMA (PERSIS DESAIN LAMA)
+# DASHBOARD UTAMA: 100% SAMA DENGAN DESAIN LAMA
 # ==========================================
 else:
     user = st.session_state['user']
     
-    # Bar Atas Informasi Akun
-    col_title, col_logout = st.columns([0.85, 0.15])
-    col_title.markdown(f"<p style='font-size: 14px; color: #64748b;'>Workspace Pengguna: <b>{user.upper()}</b></p>", unsafe_allow_html=True)
-    if col_logout.button("Keluar Akun", key="btn_logout"):
+    # Header Pengguna & Tombol Keluar Akun
+    h_col1, h_col2 = st.columns([0.85, 0.15])
+    h_col1.markdown(f"<p style='font-family: \"Plus Jakarta Sans\"; color: #64748b; margin-top:15px;'>Workspace Pengguna: <strong style='color:#0ea5e9;'>{user.upper()}</strong></p>", unsafe_allow_html=True)
+    if h_col2.button("Keluar Akun", use_container_width=True):
         st.session_state['user'] = None
-        st.session_state['timer_done'] = False
         st.rerun()
 
-    # Layout Dua Kolom Sejajar (Persis Screenshot 211732)
-    col_kiri, col_kanan = st.columns([1, 1])
-    
-    # --- KOLOM KIRI: TIMER & MUSIK ---
-    with col_kiri:
-        st.markdown('<div class="zephyr-card">', unsafe_allow_html=True)
-        st.markdown("<h3 style='margin-top:0;'>⏱️ Timer & Musik</h3>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 13px; color: #94a3b8; margin-top: -10px;'>Fokus selembut embusan angin.</p>", unsafe_allow_html=True)
-        
-        # Pilihan Waktu Fokus
-        duration_option = st.selectbox("Atur waktu fokus:", ["25:00 (Pomodoro)", "50:00", "00:05 (Uji Coba Quick)"])
-        if "25:00" in duration_option: seconds = 25 * 60
-        elif "50:00" in duration_option: seconds = 50 * 60
-        else: seconds = 5
-        
-        # Pemutar Musik
-        st.markdown("<p style='font-size: 14px; font-weight:600; margin-bottom:5px;'>🎵 Musik Pengiring:</p>", unsafe_allow_html=True)
-        music_choice = st.radio("Genre Audio Loop:", ["Relaxing Ambient Rain", "Soft Lofi Focus Beats"], horizontal=True, label_visibility="collapsed")
-        
-        if music_choice == "Relaxing Ambient Rain":
-            st.audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3")
-        else:
-            st.audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3")
-            
-        # Tampilan Angka Countdown Digital Murni
-        timer_placeholder = st.empty()
-        mins, secs = divmod(seconds, 60)
-        timer_placeholder.markdown(f'<div class="timer-display">{mins:02d}:{secs:02d}</div>', unsafe_allow_html=True)
-        
-        col_btn1, col_btn2 = st.columns(2)
-        if col_btn1.button("Mulai Sesi", use_container_width=True):
-            st.session_state['timer_done'] = False
-            for t in range(seconds, -1, -1):
-                m, s = divmod(t, 60)
-                timer_placeholder.markdown(f'<div class="timer-display">{m:02d}:{s:02d}</div>', unsafe_allow_html=True)
-                time.sleep(1)
-            st.session_state['timer_done'] = True
-            st.balloons()
-            st.rerun()
-            
-        if col_btn2.button("Reset", key="reset_timer", use_container_width=True):
-            st.session_state['timer_done'] = False
-            st.rerun()
-            
-        st.markdown('</div>', unsafe_allow_html=True)
+    # Ambil data task user saat ini
+    user_tasks = db[user].get("tasks", [])
 
-    # --- KOLOM KANAN: LIST TUGAS (TO-DO LIST) ---
-    with col_kanan:
-        st.markdown('<div class="zephyr-card">', unsafe_allow_html=True)
-        st.markdown("<h3 style='margin-top:0;'>📝 List Tugas</h3>", unsafe_allow_html=True)
-        st.markdown("<p style='font-size: 13px; color: #94a3b8; margin-top: -10px;'>Catat dan bersihkan tugas yang sudah selesai.</p>", unsafe_allow_html=True)
-        
-        # Kolom Tambah Tugas
-        col_inp, col_add = st.columns([0.75, 0.25])
-        new_task = col_inp.text_input("Input tugas", placeholder="Ketik tugas baru di sini...", label_visibility="collapsed")
-        if col_add.button("Tambah", use_container_width=True):
-            if new_task:
-                db[user]["tasks"].append(new_task)
+    # INPUT BARU LEWAT UTAS STREAMLIT AGAR REAKTIF SINKRON KE DATABASE
+    # (Kita taruh di atas layout agar penambahan tugas super responsif)
+    with st.expander("➕ Tambah Tugas Baru"):
+        t_col1, t_col2 = st.columns([0.8, 0.2])
+        task_input = t_col1.text_input("Nama Tugas", placeholder="Ketik tugas di sini...", label_visibility="collapsed")
+        if t_col2.button("Simpan", use_container_width=True):
+            if task_input:
+                user_tasks.append({"text": task_input, "done": False})
+                db[user]["tasks"] = user_tasks
                 save_data(db)
                 st.rerun()
-                
-        # Menampilkan Barisan List Tugas
-        st.write("")
-        user_tasks = db[user].get("tasks", [])
-        if user_tasks:
-            for idx, task in enumerate(user_tasks):
-                col_t1, col_t2 = st.columns([0.85, 0.15])
-                col_t1.markdown(f"<div style='padding: 5px 0; color:#475569;'>⬜ &nbsp; {task}</div>", unsafe_allow_html=True)
-                if col_t2.button("🗑️", key=f"del_{idx}"):
-                    db[user]["tasks"].pop(idx)
-                    save_data(db)
-                    st.rerun()
-        else:
-            st.markdown("<p style='color:#94a3b8; font-size:14px; font-style:italic;'>Tidak ada tugas pending.</p>", unsafe_allow_html=True)
-            
-        st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- BAGIAN BAWAH: EVALUASI & RIWAYAT MOOD BULANAN ---
-    st.markdown('<div class="zephyr-card">', unsafe_allow_html=True)
-    st.markdown("<h3 style='margin-top:0;'>📊 Rangkuman Riwayat Mood Bulan Ini</h3>", unsafe_allow_html=True)
-    
-    # Trigger evaluasi jika sesi fokus baru saja diselesaikan
-    if st.session_state['timer_done']:
-        st.markdown("<div style='background-color:#f0fdf4; padding:15px; border-radius:10px; margin-bottom:15px;'>", unsafe_allow_html=True)
-        st.markdown("🎯 <b>Sesi Fokus Selesai!</b> Bagaimana kondisi emosimu sekarang?", unsafe_allow_html=True)
-        ev_mood = st.selectbox("Pilih Status Emosi:", ["😊 Bahagia & Produktif", "😐 Biasa Saja", "😢 Lelah/Sedih", "😡 Stres/Lelah"], key="sel_ev")
-        if st.button("Simpan Data Mood"):
-            today_str = datetime.today().strftime('%Y-%m-%d')
-            db[user]["mood_history"][today_str] = ev_mood
+    # Menerima data kiriman balik dari JavaScript checklist jika ada perubahan status tugas
+    # (Menggunakan query parameter URL rahasia bawaan iframe streamlit)
+    query_params = st.query_params
+    if "toggle_idx" in query_params:
+        idx_to_toggle = int(query_params["toggle_idx"])
+        if idx_to_toggle < len(user_tasks):
+            user_tasks[idx_to_toggle]["done"] = not user_tasks[idx_to_toggle]["done"]
+            db[user]["tasks"] = user_tasks
             save_data(db)
-            st.session_state['timer_done'] = False
-            st.success("Mood terekam!")
-            time.sleep(0.5)
+            st.query_params.clear()
             st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-    # Tampilan Laporan Bulanan (Grafik & Log)
-    history = db[user].get("mood_history", {})
-    if history:
-        col_graph, col_logs = st.columns([0.6, 0.4])
-        
-        with col_graph:
-            mood_counts = {"😊 Bahagia & Produktif": 0, "😐 Biasa Saja": 0, "😢 Lelah/Sedih": 0, "😡 Stres/Lelah": 0}
-            for emosi in history.values():
-                if emosi in mood_counts: mood_counts[emosi] += 1
-            st.bar_chart(mood_counts)
             
-        with col_logs:
-            st.markdown("<p style='font-size:14px; font-weight:600;'>Jurnal harian:</p>", unsafe_allow_html=True)
-            for tanggal, emosi in sorted(history.items(), reverse=True)[:5]:
-                st.markdown(f"🗓️ <small>{tanggal}</small> : <b>{emosi}</b>", unsafe_allow_html=True)
-    else:
-        st.markdown("<p style='color:#94a3b8; font-size:14px;'>Belum ada data masuk. Selesaikan pengukur waktu fokus di atas untuk membuat laporan mood pertamamu.</p>", unsafe_allow_html=True)
-        
-    st.markdown('</div>', unsafe_allow_html=True)
+    if "delete_idx" in query_params:
+        idx_to_del = int(query_params["delete_idx"])
+        if idx_to_del < len(user_tasks):
+            user_tasks.pop(idx_to_del)
+            db[user]["tasks"] = user_tasks
+            save_data(db)
+            st.query_params.clear()
+            st.rerun()
+
+    # BENTUK STRUKTUR ELEMEN HTML & JAVASCRIPT ASLI YANG SUPER INDAH
+    # Kita buat list generator dalam format baris teks HTML
+    tasks_html_elements = ""
+    for idx, t in enumerate(user_tasks):
+        checked_attr = "checked" if t["done"] else ""
+        text_style = "text-decoration: line-through; color: #94a3b8;" if t["done"] else "color: #334155;"
+        tasks_html_elements += f"""
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f8fafc; border-radius: 10px; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" {checked_attr} style="width: 18px; height: 18px; accent-color: #38bdf8; cursor: pointer;" 
+                       onclick="window.parent.location.href = window.parent.location.pathname + '?toggle_idx={idx}';">
+                <span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; {text_style}">{t['text']}</span>
+            </div>
+            <button style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 16px;" 
+                    onclick="window.parent.location.href = window.parent.location.pathname + '?delete_idx={idx}';">🗑️</button>
+        </div>
+        """
+
+    if not tasks_html_elements:
+        tasks_html_elements = "<p style='color: #94a3b8; font-style: italic; font-size: 14px;'>Belum ada tugas. Ambil nafas dalam-dalam!</p>"
+
+    # --- SUNTIKAN BLOK KODE HTML UTAMA (PERSIS DESIGN SCREENSHOT 211732) ---
+    main_dashboard_html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+        <style>
+            body {{
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                margin: 0;
+                padding: 0;
+                background: transparent;
+            }}
+            .workspace-layout {{
+                display: flex;
+                gap: 25px;
+                margin-bottom: 25px;
+            }}
+            .card {{
+                background: white;
+                border-radius: 20px;
+                padding: 30px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.01);
+                flex: 1;
+                border: 1px solid rgba(255,255,255,0.7);
+            }}
+            .card-title {{
+                font-size: 20px;
+                font-weight: 700;
+                color: #1e293b;
+                margin-top: 0;
+                margin-bottom: 5px;
+            }}
+            .card-subtitle {{
+                font-size: 13px;
+                color: #94a3b8;
+                margin-bottom: 20px;
+            }}
+            /* Timer Styling */
+            .timer-box {{
+                text-align: center;
+                margin: 20px 0;
+            }}
+            .timer-text {{
+                font-size: 72px;
+                font-weight: 700;
+                color: #1e293b;
+                font-family: monospace;
+            }}
+            .btn-group {{
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                margin-top: 15px;
+            }}
+            .btn {{
+                border: none;
+                padding: 10px 25px;
+                border-radius: 10px;
+                font-weight: 600;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.2s;
+            }}
+            .btn-start {{ background: #38bdf8; color: white; }}
+            .btn-start:hover {{ background: #0ea5e9; }}
+            .btn-pause {{ background: #cbd5e1; color: #475569; }}
+            .btn-reset {{ background: #fca5a5; color: #b91c1c; }}
+            
+            /* Spotify Styling */
+            .spotify-input {{
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                margin-bottom: 10px;
+                box-sizing: border-box;
+            }}
+            .full-card {{
+                background: white;
+                border-radius: 20px;
+                padding: 30px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.01);
+                border: 1px solid rgba(255,255,255,0.7);
+            }}
+        </style>
+    </head>
+    <body>
+
+        <div class="workspace-layout">
+            <div class="card">
+                <div class="card-title">⏱️ Timer & Musik</div>
+                <div class="card-subtitle">Fokus selembut embusan angin.</div>
+                
+                <input type="text" id="spotifyUrl" class="spotify-input" placeholder="Masukkan Link Share Playlist/Lagu Spotify-mu di sini..." 
+                       value="https://open.spotify.com/embed/playlist/37i9dQZF1GXr7wY6v9" onchange="updateSpotify()">
+                
+                <iframe id="spotifyPlayer" src="https://open.spotify.com/embed/playlist/37i9dQZF1GXr7wY6v9" 
+                        width="100%" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media" style="border-radius:10px;"></div>
+                
+                <div class="timer-box">
+                    <div style="margin-bottom:10px;">
+                        <input type="number" id="customMinutes" style="width: 60px; padding:5px; border-radius:5px; border:1px solid #ccc; text-align:center;" value="25"> Menit
+                    </div>
+                    <div class="timer-text" id="display">25:00</div>
+                    <div class="btn-group">
+                        <button class="btn btn-start" onclick="startTimer()">Mulai</button>
+                        <button class="btn btn-pause" onclick="pauseTimer()">Jeda</button>
+                        <button class="btn btn-reset" onclick="resetTimer()">Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📝 List Tugas</div>
+                <div class="card-subtitle">Catat dan centang tugas yang sudah selesai.</div>
+                <div style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
+                    {tasks_html_elements}
+                </div>
+            </div>
+        </div>
+
+        <div class="full-card">
+            <div class="card-title">📊 Rangkuman Riwayat Mood Bulan Ini</div>
+            <p style="color: #64748b; font-size:14px; margin-top:5px;">Selesaikan pengukur waktu fokus di atas untuk memicu laporan evaluasi mood harian otomatis.</p>
+        </div>
+
+        <script>
+            let countdown;
+            let timerSeconds = 25 * 60;
+            let isRunning = false;
+            
+            function updateSpotify() {{
+                let url = document.getElementById('spotifyUrl').value;
+                if(url.includes("open.spotify.com")) {{
+                    let embedUrl = url.replace("open.spotify.com/", "open.spotify.com/embed/");
+                    document.getElementById('spotifyPlayer').src = embedUrl;
+                }}
+            }}
+
+            function displayTime(seconds) {{
+                const min = Math.floor(seconds / 60);
+                const sec = seconds % 60;
+                document.getElementById('display').innerText = 
+                    `${{min < 10 ? '0' : ''}}${{min}}:${{sec < 10 ? '0' : ''}}${{sec}}`;
+            }}
+
+            function startTimer() {{
+                if (isRunning) return;
+                
+                // Ambil nilai menit kustom dari kotak input saat tombol start ditekan
+                if(timerSeconds === 25 * 60 || timerSeconds === 0) {{
+                    let customMin = parseInt(document.getElementById('customMinutes').value) || 25;
+                    timerSeconds = customMin * 60;
+                }}
+                
+                isRunning = true;
+                countdown = setInterval(() => {{
+                    timerSeconds--;
+                    displayTime(timerSeconds);
+                    
+                    if (timerSeconds <= 0) {{
+                        clearInterval(countdown);
+                        isRunning = false;
+                        alert("Sesi fokus selesai! Silakan isi evaluasi mood kamu.");
+                    }}
+                }}, 1000);
+            }}
+
+            function pauseTimer() {{
+                clearInterval(countdown);
+                isRunning = false;
+            }}
+
+            function resetTimer() {{
+                clearInterval(countdown);
+                isRunning = false;
+                let customMin = parseInt(document.getElementById('customMinutes').value) || 25;
+                timerSeconds = customMin * 60;
+                displayTime(timerSeconds);
+            }}
+        </script>
+    </body>
+    </html>
+    """
+    
+    # Render semua HTML & CSS super cantik di atas ke dalam interface web utama kamu
+    st.components.v1.html(main_dashboard_html, height=650, scroller=False)
