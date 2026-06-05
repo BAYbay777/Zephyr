@@ -1,30 +1,31 @@
 import streamlit as st
 import json
 import os
+import time
+from datetime import datetime
 
-# Setingan dasar halaman agar responsif saat dimasukkan ke HTML
-st.set_page_config(page_title="Zephyr Features", layout="centered")
+# 1. Konfigurasi Dasar Halaman Streamlit
+st.set_page_config(page_title="Zephyr Dashboard", layout="centered")
 
-# --- CUSTOM CSS AGAR COCOK DENGAN TEMA ANGIN LEMBUT KAMU ---
+# Custom CSS agar tema menyatu dengan "Angin Lembut" (Hijau muda & Biru muda pastel)
 st.markdown("""
     <style>
     .stApp { background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); }
-    h1, h2, h3, p, label { color: #0f172a !important; font-family: 'Plus Jakarta Sans', sans-serif; }
-    .stButton>button { background-color: #38bdf8; color: white; border-radius: 8px; border: none; }
-    .stButton>button:hover { background-color: #0ea5e9; color: white; }
+    h1, h2, h3, p, label, span { color: #0f172a !important; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .stButton>button { background-color: #38bdf8; color: white; border-radius: 8px; border: none; width: 100%; }
+    .stButton>button:hover { background-color: #0ea5e9; }
+    .css-1r6g72d { background-color: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
     </style>
 """, unsafe_allow_html=True)
 
-# --- DATABASE SEDERHANA MENGGUNAKAN JSON ---
-DATA_FILE = "streamlit_workspace_data.json"
+# 2. Database JSON Tunggal untuk Menampung Semua Data User
+DATA_FILE = "zephyr_master_data.json"
 
 def load_data():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, 'r') as f:
-            try:
-                return json.load(f)
-            except:
-                return {}
+            try: return json.load(f)
+            except: return {}
     return {}
 
 def save_data(data):
@@ -33,85 +34,153 @@ def save_data(data):
 
 db = load_data()
 
-# --- SISTEM LOGIN & REGISTER MULTI-USER ---
-if 'current_user' not in st.session_state:
-    st.session_state['current_user'] = None
+# Inisialisasi Session State Streamlit
+if 'user' not in st.session_state:
+    st.session_state['user'] = None
+if 'timer_done' not in st.session_state:
+    st.session_state['timer_done'] = False
 
-if st.session_state['current_user'] is None:
-    st.title("🍃 Masuk ke Workspace Zephyr")
-    menu = st.radio("Pilih Menu:", ["Login", "Daftar Akun"], horizontal=True)
+# ==========================================
+# SEKSYEN A: AUTENTIKASI (LOGIN & REGISTER)
+# ==========================================
+if st.session_state['user'] is None:
+    st.title("🍃 Zephyr Workspace Login")
+    menu = st.radio("Pilih Aksi:", ["Masuk (Login)", "Daftar Akun Baru"], horizontal=True)
     
-    username = st.text_input("Username (Huruf Kecil)").strip().lower()
+    username = st.text_input("Username").strip().lower()
     password = st.text_input("Password", type="password")
     
-    if menu == "Daftar Akun":
-        if st.button("Buat Akun Baru"):
+    if menu == "Daftar Akun Baru":
+        if st.button("Buat Akun"):
             if username in db:
-                st.error("Username sudah terdaftar, gunakan nama lain!")
+                st.error("Username sudah terdaftar!")
             elif username and password:
-                # Membuat struktur data kosong khusus untuk user baru ini
-                db[username] = {"password": password, "tasks": [], "mood": "Biasa Saja"}
+                # Struktur lengkap data per user baru
+                db[username] = {
+                    "password": password,
+                    "tasks": [],
+                    "mood_history": {} # Format: {"YYYY-MM-DD": "Mood"}
+                }
                 save_data(db)
-                st.success("Akun berhasil dibuat! Silakan pindah ke menu Login.")
+                st.success("Akun sukses dibuat! Silakan pilih menu Masuk.")
     else:
         if st.button("Masuk"):
             if username in db and db[username]["password"] == password:
-                st.session_state['current_user'] = username
+                st.session_state['user'] = username
                 st.rerun()
             else:
                 st.error("Username atau password salah.")
+
+# ==========================================
+# SEKSYEN B: HALAMAN UTAMA WORKSPACE USER
+# ==========================================
 else:
-    user = st.session_state['current_user']
+    user = st.session_state['user']
     
-    # Tombol Logout di pojok atas
-    col_user, col_logout = st.columns([0.8, 0.2])
-    col_user.write(f"Login sebagai: **{user}**")
-    if col_logout.button("Log Out"):
-        st.session_state['current_user'] = None
+    # Header & Log Out
+    col_head, col_logo = st.columns([0.8, 0.2])
+    col_head.header(f"Selamat Datang, {user.capitalize()}!")
+    if col_logo.button("Keluar"):
+        st.session_state['user'] = None
+        st.session_state['timer_done'] = False
         st.rerun()
         
     st.write("---")
 
-    # --- 1. FITUR MOOD TRACKER ---
-    st.subheader("📊 Mood Tracker")
-    current_mood = db[user].get("mood", "Biasa Saja")
-    mood_options = ["😊 Bahagia", "😐 Biasa Saja", "😢 Sedih", "😡 Lelah/Stres"]
+    # 1. FITUR TIMER FOKUS & LAGU (Saling Terintegrasi)
+    st.subheader("⏱️ Focus Timer & 🎵 Ambient Music")
     
-    try:
-        default_idx = mood_options.index(current_mood)
-    except:
-        default_idx = 1
+    # Pilihan durasi timer
+    duration_option = st.selectbox("Pilih Waktu Fokus:", ["5 Detik (Uji Coba)", "25 Menit (Pomodoro)", "50 Menit"])
+    if duration_option == "5 Detik (Uji Coba)":
+        seconds = 5
+    elif duration_option == "25 Menit (Pomodoro)":
+        seconds = 25 * 60
+    else:
+        seconds = 50 * 60
+
+    # Fitur Lagu Pengiring menggunakan Embed Audio Publik Gratis
+    st.write("🎵 **Pilih Musik Pengiring Fokus:**")
+    music_choice = st.radio("Pilih Genre:", ["Relaxing Rain", "Lofi Beats (No Copyright)"], horizontal=True)
+    
+    if music_choice == "Relaxing Rain":
+        st.audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3") # Contoh audio stream link 1
+    else:
+        st.audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3") # Contoh audio stream link 2
+
+    # Logika Tombol Jalankan Timer
+    if st.button("⏱️ Mulai Sesi Fokus"):
+        st.session_state['timer_done'] = False
+        timer_placeholder = st.empty()
         
-    chosen_mood = st.selectbox("Bagaimana perasaanmu saat ini?", mood_options, index=default_idx)
-    
-    if chosen_mood != current_mood:
-        db[user]["mood"] = chosen_mood
-        save_data(db)
-        st.toast(f"Mood kamu disimpan: {chosen_mood}")
+        # Proses hitung mundur realtime
+        for t in range(seconds, -1, -1):
+            mins, secs = divmod(t, 60)
+            timer_placeholder.metric(label="Waktu Tersisa", value=f"{mins:02d}:{secs:02d}")
+            time.sleep(1)
+            
+        st.session_state['timer_done'] = True
+        st.balloons()
+        st.success("Sesi fokus selesai! Kerja bagus!")
+
+    # 2. LAPORAN MOOD SETELAH TIMER SELESAI (Muncul otomatis jika timer_done = True)
+    if st.session_state['timer_done']:
+        st.info("💡 **Sesi fokus selesai! Bagaimana perasaan/mood kamu sekarang?**")
+        mood_after_timer = st.selectbox(
+            "Catat evaluasi mood-mu:", 
+            ["😊 Bahagia & Produktif", "😐 Biasa Saja", "😢 Lelah/Sedih", "😡 Stres Berat"],
+            key="mood_timer_key"
+        )
+        if st.button("Simpan Evaluasi Mood"):
+            today_str = datetime.today().strftime('%Y-%m-%d')
+            db[user]["mood_history"][today_str] = mood_after_timer
+            save_data(db)
+            st.success("Mood berhasil direkam ke riwayat bulanan!")
+            st.session_state['timer_done'] = False # Reset state
+            st.rerun()
 
     st.write("---")
 
-    # --- 2. FITUR TO-DO LIST ---
-    st.subheader("📝 Daftar Tugas")
-    
-    # Form Input Tugas Baru
-    new_task = st.text_input("Tulis tugas baru di sini...")
-    if st.button("Tambah Tugas"):
+    # 3. FITUR TO-DO LIST
+    st.subheader("📝 Zephyr To-Do List")
+    new_task = st.text_input("Ketik tugas baru kamu di sini...", placeholder="Contoh: Belajar UTBK Matematika")
+    if st.button("Tambah ke Daftar"):
         if new_task:
-            db[user]["tasks"].append(new_task)
+            db[user]["tasks"].append(new_tasks_list := new_task)
             save_data(db)
             st.rerun()
             
-    # Menampilkan daftar tugas milik user terkait
+    # Tampilkan Tugas yang Ada
     user_tasks = db[user].get("tasks", [])
     if user_tasks:
-        st.write("Daftar tugasmu (Klik tombol 🗑️ jika sudah selesai):")
         for idx, task in enumerate(user_tasks):
-            t_col1, t_col2 = st.columns([0.85, 0.15])
-            t_col1.write(f"⬜ {task}")
-            if t_col2.button("🗑️", key=f"delete_{idx}"):
+            col_t1, col_t2 = st.columns([0.85, 0.15])
+            col_t1.write(f"⬜ {task}")
+            if col_t2.button("🗑️", key=f"del_{idx}"):
                 db[user]["tasks"].pop(idx)
                 save_data(db)
                 st.rerun()
     else:
-        st.info("Belum ada tugas. Nikmati harimu!")
+        st.caption("Belum ada tugas tersimpan. Kamu bebas hari ini!")
+
+    st.write("---")
+
+    # 4. LAPORAN MOOD BULANAN (GRAFIK)
+    st.subheader("📊 Laporan Riwayat Mood Bulanan")
+    history = db[user].get("mood_history", {})
+    
+    if history:
+        st.write("Berikut adalah daftar rekam jejak emosimu bulan ini:")
+        
+        # Hitung akumulasi statistik mood
+        mood_counts = {"😊 Bahagia & Produktif": 0, "😐 Biasa Saja": 0, "😢 Lelah/Sedih": 0, "😡 Stres Berat": 0}
+        for date, emosi in history.items():
+            if emosi in mood_counts:
+                mood_counts[emosi] += 1
+            st.text(f"📅 Tanggal {date} -> Status: {emosi}")
+            
+        # Tampilkan Grafik Batang Sederhana Bawaan Streamlit
+        st.write("📈 **Grafik Distribusi Mood:**")
+        st.bar_chart(mood_counts)
+    else:
+        st.info("Belum ada riwayat mood yang tercatat bulan ini. Selesaikan sesi timer fokusmu untuk mengisinya!")
