@@ -234,3 +234,31 @@
             transform: scale(1.1);
             background: #e0f2fe;
         }
+/* --- CSS BARU UNTUK DUA TOMBOL TIMER BERDAMPINGAN --- */
+.timer-btn-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    width: 100%;
+}
+
+/* Mengatur ukuran tombol Utama (Mulai) */
+#timerBtn {
+    flex: 2;
+    margin-top: 0;
+}
+
+/* Mengatur ukuran tombol Reset */
+#resetTimerBtn {
+    flex: 1;
+    margin-top: 0;
+    background-color: #e2e8f0;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    transition: all 0.2s;
+}
+
+#resetTimerBtn:hover {
+    background-color: #cbd5e1;
+    color: #1e293b;
+}
