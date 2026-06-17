@@ -137,3 +137,31 @@
             left: 0;
             border: none;
         }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Mencegah munculnya scrollbar ganda/berlapis di browser */
+}
+
+/* Selektor pembungkus luar iframe Canva di index.html */
+.auth-container, .canva-wrapper {
+    width: 100vw;    /* Mengambil 100% lebar layar */
+    height: 100vh;   /* Mengambil 100% tinggi layar */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0f172a; /* Warna latar belakang gelap bawaan Zephyr */
+}
+
+/* Memaksa elemen iframe Canva meregang penuh tanpa batas */
+#canvaIframe, iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+    display: block;
+}
