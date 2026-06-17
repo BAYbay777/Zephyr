@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk atau Daftar - Zephyr</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700&display=swap" rel="stylesheet">
+    
+  
+</head>
+<body>
+
+    <a href="index.html" class="back-to-home">← Kembali</a>
+
+    <div class="auth-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('login')">🔒 Masuk</button>
+            <button class="tab-btn" onclick="switchTab('register')">📝 Daftar</button>
+        </div>
+
+        <div id="auth-msg" class="message"></div>
+
+        <div id="login-panel" class="form-panel active">
+            <h2>Masuk ke Workspace</h2>
+            <p class="subtitle">Silakan masukkan akun Zephyr Anda yang telah terdaftar.</p>
+            <form onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label>Username</label>
+                    <input type="text" id="login-user" required placeholder="Masukkan username">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="login-pass" required placeholder="Masukkan password">
+                </div>
+                <button type="submit" class="submit-btn">Masuk Sekarang</button>
+            </form>
+        </div>
+
+        <div id="register-panel" class="form-panel">
+            <h2>Buat Akun Baru</h2>
+            <p class="subtitle">Daftarkan username unik untuk mengamankan ruang kerja Anda.</p>
+            <form onsubmit="handleRegister(event)">
+                <div class="input-group">
+                    <label>Username Baru</label>
+                    <input type="text" id="reg-user" required placeholder="Contoh: baybay777">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="reg-pass" required placeholder="Minimal 6 karakter">
+                </div>
+                <div class="input-group">
+                    <label>Konfirmasi Password</label>
+                    <input type="password" id="reg-confirm" required placeholder="Ketik ulang password">
+                </div>
+                <button type="submit" class="submit-btn">Daftar Akun</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="bypass-container">
+        <a href="product.html" class="bypass-link">Langsung masuk ke Workspace tanpa akun →</a>
+    </div>
+    
+    <div class="bg-deco">ZEPHYR</div>
+
+    <script>
+        // Inisialisasi basis data lokal menggunakan localStorage jika belum ada
+        if (!localStorage.getItem('zephyr_users')) {
+            localStorage.setItem('zephyr_users', JSON.stringify([]));
+        }
+
+        function switchTab(type) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.form-panel').forEach(panel => panel.classList.remove('active'));
+            hideMessage();
+
+            if (type === 'login') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('login-panel').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('register-panel').classList.add('active');
+            }
+        }
+
+        function showMessage(text, isError) {
+            const msgDiv = document.getElementById('auth-msg');
+            msgDiv.innerText = text;
+            msgDiv.className = isError ? 'message error' : 'message success';
+            msgDiv.style.display = 'block';
+        }
+
+        function hideMessage() {
+            document.getElementById('auth-msg').style.display = 'none';
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            hideMessage();
+            
+            const user = document.getElementById('login-user').value.trim();
+            const pass = document.getElementById('login-pass').value;
+            const users = JSON.parse(localStorage.getItem('zephyr_users'));
+
+            const foundUser = users.find(u => u.username === user && u.password === pass);
+
+            if (foundUser) {
+                showMessage("🎉 Login Berhasil! Mengalihkan ke Workspace...", false);
+                setTimeout(() => {
+                    window.location.href = "product.html";
+                }, 1000);
+            } else {
+                showMessage("❌ Username atau Password salah! Periksa kembali data Anda.", true);
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            hideMessage();
+
+            const user = document.getElementById('reg-user').value.strip ? document.getElementById('reg-user').value.strip() : document.getElementById('reg-user').value.trim();
+            const pass = document.getElementById('reg-pass').value;
+            const confirm = document.getElementById('reg-confirm').value;
+            const users = JSON.parse(localStorage.getItem('zephyr_users'));
+
+            if (user === "" || pass === "") {
+                showMessage("⚠️ Data tidak boleh kosong!", true);
+                return;
+            }
+            if (pass.length < 6) {
+                showMessage("🔒 Password minimal harus terdiri dari 6 karakter!", true);
+                return;
+            }
+            if (pass !== confirm) {
+                showMessage("❌ Konfirmasi password tidak cocok!", true);
+                return;
+            }
+
+            const userExists = users.some(u => u.username.toLowerCase() === user.toLowerCase());
+            if (userExists) {
+                showMessage("⚠️ Username tersebut sudah terdaftar! Gunakan nama lain.", true);
+                return;
+            }
+
+            // Simpan akun baru ke database lokal
+            users.push({ username: user, password: pass });
+            localStorage.setItem('zephyr_users', JSON.stringify(users));
+
+            showMessage("🎉 Akun berhasil dibuat! Silakan beralih ke tab 'Masuk'.", false);
+            e.target.reset();
+        }
+    </script>
+</body>
+</html>
