@@ -1,4 +1,3 @@
-    <style>
         /* --- TEMA UTAMA: ANGIN LEMBUT (SOFT BREEZE) --- */
         :root {
             --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); /* Hijau & Biru pastel */
@@ -235,4 +234,3 @@
             transform: scale(1.1);
             background: #e0f2fe;
         }
-    </style>
