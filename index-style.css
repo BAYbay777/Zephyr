@@ -1,8 +1,6 @@
-/* index-style.css - Versi Bersih Layar Penuh Zephyr */
+/* index-style.css - Solusi Pamungkas Canva Layar Penuh */
 :root {
-    --bg-dark: #0f172a;
-    --text-light: #f8fafc;
-    --nav-bg: #f0fdf4; /* Bertema Soft Breeze */
+    --nav-bg: rgba(240, 253, 244, 0.85); /* Membuat navbar sedikit transparan agar estetik */
 }
 
 * {
@@ -14,22 +12,30 @@
 html, body {
     width: 100%;
     height: 100%;
-    background-color: var(--bg-dark);
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Menghapus semua scrollbar bawaan */
+    background-color: #000; /* Dasar hitam agar transisi Canva mulus */
     font-family: 'Plus Jakarta Sans', sans-serif;
-    overflow: hidden; /* Menghilangkan scrollbar utama browser */
 }
 
-/* --- BAR NAVIGASI --- */
+/* --- BAR NAVIGASI MENGAPUNG (FLOATING NAVBAR) --- */
 nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 40px;
     background-color: var(--nav-bg);
-    position: relative;
-    z-index: 10; /* Memastikan navbar berada paling depan */
-    height: 60px; /* Tinggi navbar dipatok statis */
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    backdrop-filter: blur(8px); /* Efek kaca blur pada navbar */
+    
+    /* Membuat navbar mengapung di atas Canva */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 9999; /* Memaksa nomor satu paling depan */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
 .logo {
@@ -53,19 +59,21 @@ nav ul li a {
 }
 
 nav ul li a:hover, nav ul li a.active {
-    color: #16a34a; /* Warna hijau penanda aktif */
+    color: #16a34a;
     font-weight: 600;
 }
 
-/* --- PEMBUNGKUS EMBED CANVA LAYAR PENUH --- */
+/* --- SELEKTOR CANVA LAYAR PENUH MUTLAK --- */
 .canva-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100vw;
-    /* Tinggi Canva otomatis dikurangi tinggi navbar (60px) agar pas */
-    height: calc(100vh - 60px); 
+    height: 100vh;
+    z-index: 1; /* Berada di belakang navbar */
     margin: 0;
     padding: 0;
     overflow: hidden;
-    position: relative;
 }
 
 .canva-container {
