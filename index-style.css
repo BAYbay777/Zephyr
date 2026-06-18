@@ -1,115 +1,160 @@
-/* --- TEMA UTAMA: ANGIN LEMBUT (SOFT BREEZE) --- */
-        :root {
-            --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
-            --text-main: #334155;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-        }
+/* --- PENGATURAN DASAR & VARIABEL --- */
+:root {
+    --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); /* Gradasi hijau & biru pastel lembut */
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --text-main: #334155;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --shadow-soft: 0 10px 30px -10px rgba(148, 163, 184, 0.2);
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
 
-        /* --- BAR NAVIGASI --- */
-        nav {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-        }
+/* --- GAYA BAR NAVIGASI (NAVBAR) --- */
+nav {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px); /* Efek blur transparan modern */
+    -webkit-backdrop-filter: blur(10px);
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
 
-        nav .logo {
-            font-weight: 700;
-            font-size: 20px;
-            letter-spacing: 2px;
-            color: #0284c7;
-        }
+nav .logo {
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: #0284c7;
+}
 
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 30px;
-        }
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+}
 
-        nav ul li {
-            display: inline;
-        }
+nav ul li a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 16px;
+    text-transform: lowercase;
+    transition: color 0.3s ease;
+}
 
-        nav ul li a {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 16px;
-            text-transform: lowercase;
-            transition: color 0.3s ease;
-        }
+nav ul li a:hover, nav ul li a.active {
+    color: #0284c7;
+}
 
-        nav ul li a:hover, nav ul li a.active {
-            color: #0284c7;
-        }
+/* --- TAMPILAN HERO SECTION --- */
+.hero-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
 
-        /* --- JUDUL HALAMAN --- */
-        .page-title {
-            text-align: center;
-            font-size: 56px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-top: 50px;
-            margin-bottom: 10px;
-            letter-spacing: -1px;
-        }
+.hero-section h1 {
+    font-size: 64px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 20px 0;
+    letter-spacing: -1px;
+    background: none; /* Menghapus background kuning dari versi lama */
+    padding: 0;
+}
 
-        /* --- WADAH EMBED CANVA (RESPONSIF TINGGI) --- */
-        .canva-wrapper {
-            max-width: 900px;
-            width: 90%;
-            margin: 20px auto 60px auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            border-radius: 16px;
-            overflow: hidden;
-            background: white;
-            border: 1px solid var(--border-color);
-        }
+.hero-section p {
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 0 40px 0;
+    line-height: 1.6;
+}
 
-        .canva-container {
-            position: relative;
-            width: 100%;
-            height: 0;
-            /* Rasio aspek tinggi khusus untuk dokumen infografis/materi panjang Canva */
-            padding-top: 142%; 
-        }
+/* --- GAYA TOMBOL UTAMA --- */
+.btn-start {
+    font-family: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 16px 32px;
+    background-color: #38bdf8;
+    color: white;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
+    transition: all 0.2s ease;
+}
 
-        .canva-container iframe {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            border: none;
-        }
+.btn-start:hover {
+    background-color: #0284c7;
+    transform: translateY(-2px); /* Efek sedikit naik saat diarahkan kursor */
+    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+}
 
-        /* Responsif Layar Kecil (HP) */
-        @media (max-width: 600px) {
-            .page-title {
-                font-size: 40px;
-                margin-top: 30px;
-            }
-            nav {
-                padding: 15px 20px;
-            }
-        }
+/* --- CONTAINER FOR EMBED CANVA --- */
+.canva-embed-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: 56.25%; /* Rasio aspek 16:9 yang responsif */
+    margin-top: 20px;
+    margin-bottom: 40px;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.canva-embed-container iframe {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* --- RESPONSIVITAS LAYAR GAWAI/HP --- */
+@media (max-width: 600px) {
+    nav {
+        padding: 15px 20px;
+    }
+    .hero-section h1 {
+        font-size: 42px;
+    }
+    .hero-section p {
+        font-size: 16px;
+    }
+    nav ul {
+        gap: 15px;
+    }
+}
